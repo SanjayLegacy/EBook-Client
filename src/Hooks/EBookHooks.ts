@@ -172,5 +172,26 @@ export const useEBookHooks = (id?: string | number) => {
             });
     });
 
-    return { ebooks, book, addToCart, removeFromCart, deleteBook, currentUser, register, errors, onSubmit }
+    const [searchEBooks, setSearchEBooks] = useState<EBookModel[]>();
+    const [searchTerm, setSearchTerm] = useState<string>("");
+    let searchBooks: any;
+
+    async function search() {
+        searchBooks = await axios.post(
+            Config.API_URL + "/ebook/filterBooks",
+            { searchText: searchTerm },
+            {
+                headers: { accessToken: sessionStorage.getItem("accessToken") ?? "" },
+            }
+        );
+        setSearchEBooks(searchBooks?.data);
+    }
+
+    useEffect(() => {
+        if (searchTerm) {
+            search();
+        }
+    }, [searchTerm]);
+
+    return { ebooks, book, addToCart, removeFromCart, deleteBook, currentUser, register, errors, onSubmit, setSearchTerm, searchTerm, searchEBooks }
 }
